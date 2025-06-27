@@ -29,7 +29,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $password = null;
+    private string $password;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class, cascade: ['remove'])]
     private Collection $tasks;
@@ -75,7 +75,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -94,7 +94,8 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     public function eraseCredentials(): void
     {
-        $this->password = null;
+        // Password is already hashed, no need to erase it
+        // The password field is non-nullable, so we don't set it to null
     }
 
     public function getUserIdentifier(): string
@@ -105,5 +106,32 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     public function getSalt(): ?string
     {
         return null;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            $task->setUser(null);
+        }
+
+        return $this;
     }
 }

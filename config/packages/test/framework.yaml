@@ -1,0 +1,16 @@
+framework:
+    test: true
+    session:
+        storage_factory_id: session.storage.factory.mock_file
+    profiler:
+        collect: false
+    cache:
+        app: cache.adapter.array
+        system: cache.adapter.array
+        directory: '%kernel.cache_dir%/pools'
+        default_doctrine_provider: 'doctrine.system_cache_pool'
+    http_client:
+        scoped_clients:
+            # Configure a scoped client for the API
+            api_client:
+                base_uri: 'http://localhost' 

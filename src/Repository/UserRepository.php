@@ -21,11 +21,19 @@ class UserRepository extends ServiceEntityRepository
     {
         $user = new User();
         $user->setEmail($email);
-        $user->setPassword(
-            $hasher->hashPassword($user, $plainPassword)
-        );
+        
+        // Hash the password
+        $hashedPassword = $hasher->hashPassword($user, $plainPassword);
+        
+        // Debug: Check if password was hashed successfully
+        if (empty($hashedPassword)) {
+            throw new \RuntimeException('Password hashing failed - empty hash returned');
+        }
+        
+        $user->setPassword($hashedPassword);
         $user->setFirstName($first_name);
         $user->setLastName($last_name);
+        
         return $user;
     }
 }

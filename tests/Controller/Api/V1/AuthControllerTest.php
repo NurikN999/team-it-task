@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Tests\Controller;
+namespace App\Tests\Controller\Api\V1;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class Api/V1/AuthControllerTest extends WebTestCase
+final class AuthControllerTest extends WebTestCase
 {
     public function testIndex(): void
     {

@@ -1,0 +1,5 @@
+doctrine:
+    dbal:
+        url: 'sqlite:///:memory:'
+        driver: 'pdo_sqlite'
+        memory: true 
