@@ -38,7 +38,6 @@ class TaskRepository extends ServiceEntityRepository
             ->where('t.user = :user')
             ->setParameter('user', $user);
 
-        // Add status filter if provided
         if ($status !== null) {
             $qb->andWhere('t.status = :status')
                ->setParameter('status', $status);
