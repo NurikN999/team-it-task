@@ -21,13 +21,38 @@ final class TaskService
         private readonly EntityManagerInterface $em
     ) {}
 
-    public function handleGetTasks(User $user): JsonResponse
+    public function handleGetTasks(User $user, Request $request): JsonResponse
     {
-        $tasks = $this->taskRepository->findBy(['user' => $user]);
+        $page = max(1, (int) $request->query->get('page', 1));
+        $limit = max(1, min(100, (int) $request->query->get('limit', 10)));
+        $status = $request->query->get('status');
+        $sortBy = $request->query->get('sort_by', 'createdAt');
+        $sortOrder = strtoupper($request->query->get('sort_order', 'DESC'));
+
+        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+            $sortOrder = 'DESC';
+        }
+
+        $allowedSortFields = ['createdAt', 'updatedAt', 'title', 'status'];
+        if (!in_array($sortBy, $allowedSortFields)) {
+            $sortBy = 'createdAt';
+        }
+
+        if ($status !== null && !in_array($status, ['pending', 'in_progress', 'completed'])) {
+            $status = null;
+        }
+
+        $result = $this->taskRepository->findPaginatedTasksByUser(
+            $user,
+            $page,
+            $limit,
+            $status,
+            $sortBy,
+            $sortOrder
+        );
 
         $data = [];
-
-        foreach ($tasks as $task) {
+        foreach ($result['tasks'] as $task) {
             $data[] = [
                 'id' => $task->getId(),
                 'title' => $task->getTitle(),
@@ -37,9 +62,26 @@ final class TaskService
                 'updated_at' => $task->getUpdatedAt()->format('Y-m-d H:i:s'),
             ];
         }
+
+        $statusCounts = $this->taskRepository->getTasksCountByStatus($user);
+
         return new JsonResponse([
             'message' => 'Tasks fetched successfully',
             'data' => $data,
+            'pagination' => [
+                'current_page' => $result['page'],
+                'per_page' => $result['limit'],
+                'total' => $result['total'],
+                'total_pages' => $result['totalPages'],
+                'has_next_page' => $result['hasNextPage'],
+                'has_previous_page' => $result['hasPreviousPage'],
+            ],
+            'filters' => [
+                'status' => $status,
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+            ],
+            'status_counts' => $statusCounts,
         ], Response::HTTP_OK);
     }
 

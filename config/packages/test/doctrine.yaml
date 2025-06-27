@@ -1,5 +1,6 @@
 doctrine:
     dbal:
-        url: 'sqlite:///:memory:'
-        driver: 'pdo_sqlite'
-        memory: true 
+        url: 'postgresql://app:!ChangeMe!@localhost:5432/app'
+        driver: 'pdo_pgsql'
+        memory: false
+        server_version: '16'

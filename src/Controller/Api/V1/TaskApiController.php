@@ -18,9 +18,9 @@ final class TaskApiController extends AbstractController
 
     #[Route('/api/v1/tasks', name: 'app_api_v1_tasks_index', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return $this->taskService->handleGetTasks($this->getUser());
+        return $this->taskService->handleGetTasks($this->getUser(), $request);
     }
 
     #[Route('/api/v1/tasks', name: 'app_api_v1_tasks_create', methods: ['POST'])]

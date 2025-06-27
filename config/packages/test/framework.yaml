@@ -8,7 +8,7 @@ framework:
         app: cache.adapter.array
         system: cache.adapter.array
         directory: '%kernel.cache_dir%/pools'
-        default_doctrine_provider: 'doctrine.system_cache_pool'
+        default_doctrine_dbal_provider: 'doctrine.system_cache_pool'
     http_client:
         scoped_clients:
             # Configure a scoped client for the API
